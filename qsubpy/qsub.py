@@ -26,9 +26,9 @@ TEMPLATE_BASE = """
 # -- specify queue --
 #PBS -q hpc
 # -- estimated wall clock time (execution time): hh:mm:ss --
-#PBS -l walltime=10:00:00
+#PBS -l walltime={walltime}
 # -- number of processors/cores/nodes --
-#PBS -l nodes=1:ppn=1
+#PBS -l nodes={n_nodes}:ppn={ppn}
 # -- user email address --
 # please uncomment the following line and put in your e-mail address,
 # if you want to receive e-mail notifications on a non-default address
@@ -77,12 +77,15 @@ def prepare_script_from_code(code, code_cleanup_template, script_file):
     open(script_file, 'w').write(script_text)
 
 
-def prepare_qsub_file(qsub_output_path, script_call, job_name, logfile, errfile, env):
+def prepare_qsub_file(qsub_output_path, script_call, job_name, logfile, errfile, env, n_nodes=1, ppn=1, walltime='10:00:00'):
     open(str(qsub_output_path / QSUB_FILE_NAME), 'w').write(TEMPLATE_QSUB_CODE.format(script_call=script_call,
                                                                                       job_name=job_name,
                                                                                       logfile=qsub_output_path/LOG_PATH/logfile,
                                                                                       errfile=qsub_output_path/LOG_PATH/errfile,
-                                                                                      env=env))
+                                                                                      env=env,
+                                                                                      n_nodes=n_nodes,
+                                                                                      ppn=ppn,
+                                                                                      walltime=walltime))
 
 
 def submit_job(qsub_output_path):
@@ -90,7 +93,7 @@ def submit_job(qsub_output_path):
                                     QSUB_FILE_NAME), shell=True)
 
 
-def submit_python_code(code, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base'):
+def submit_python_code(code, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
 
     qsub_output_path = prepare_output_location(output_path)
 
@@ -100,22 +103,24 @@ def submit_python_code(code, output_path, script_arguments='', job_name="job", l
         code, PYTHON_CLEANUP_CODE_TEMPLATE, script_file_name)
 
     submit_python_script(script_file_name, output_path, script_arguments=script_arguments,
-                         job_name=job_name, logfile=logfile, errfile=errfile, env=env)
+                         job_name=job_name, logfile=logfile, errfile=errfile, env=env,
+                         n_nodes=n_nodes, ppn=ppn, walltime=walltime)
 
 
-def submit_bash_code(code, output_path, job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base'):
+def submit_bash_code(code, output_path, job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
 
     qsub_output_path = prepare_output_location(output_path)
 
     script_call = code
 
     prepare_qsub_file(qsub_output_path, script_call,
-                      job_name, logfile, errfile, env)
+                      job_name, logfile, errfile, env,
+                      n_nodes, ppn, walltime)
 
     submit_job(qsub_output_path)
 
 
-def submit_python_script(script_file_path, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base'):
+def submit_python_script(script_file_path, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
 
     qsub_output_path = prepare_output_location(output_path)
 
@@ -127,6 +132,7 @@ def submit_python_script(script_file_path, output_path, script_arguments='', job
     script_call = "python " + str(job_script_name) + ' ' + script_arguments
 
     prepare_qsub_file(qsub_output_path, script_call,
-                      job_name, logfile, errfile, env)
+                      job_name, logfile, errfile, env,
+                      n_nodes, ppn, walltime)
 
     submit_job(qsub_output_path)
