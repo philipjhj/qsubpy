@@ -87,8 +87,7 @@ def config(hpc_platform='torque'):
         #BSUB -W {walltime}
         # -- number of processors/cores/nodes --
         #BSUB -n {ppn}
-        #BSUB -R "span[ptile=m]"
-        #BSUB -R "span[hosts={n_nodes}]"
+        #BSUB -R "span[ptile={n_nodes}]"
         # -- user email address --
         # please uncomment the following line and put in your e-mail address,
         # if you want to receive e-mail notifications on a non-default address
