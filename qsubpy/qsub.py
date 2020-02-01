@@ -88,6 +88,7 @@ def config(hpc_platform='torque'):
         # -- number of processors/cores/nodes --
         #BSUB -n {ppn}
         #BSUB -R "span[ptile={n_nodes}]"
+        #BSUB -R "rusage[mem=8GB]"
         # -- user email address --
         # please uncomment the following line and put in your e-mail address,
         # if you want to receive e-mail notifications on a non-default address
@@ -160,7 +161,15 @@ def submit_job(hpc_output_path):
                                         HPC_FILE_NAME), shell=True)
 
 
-def submit_python_code(code, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+def submit_python_code(code, output_path, script_arguments='', job_name="job", logfile="{job_id_format}.output", errfile="{job_id_format}.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+
+    if HPC_PLATFORM == 'torque':
+        job_id_format = '$PBS_JOBID'
+    elif HPC_PLATFORM == 'lsf':
+        job_id_format = '%J'
+
+    logfile = logfile.format(job_id_format=job_id_format)
+    errfile = errfile.format(job_id_format=job_id_format)
 
     hpc_output_path = prepare_output_location(output_path)
 
@@ -174,7 +183,15 @@ def submit_python_code(code, output_path, script_arguments='', job_name="job", l
                          n_nodes=n_nodes, ppn=ppn, walltime=walltime)
 
 
-def submit_bash_code(code, output_path, job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+def submit_bash_code(code, output_path, job_name="job", logfile="{job_id_format}.output", errfile="{job_id_format}.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+
+    if HPC_PLATFORM == 'torque':
+        job_id_format = '$PBS_JOBID'
+    elif HPC_PLATFORM == 'lsf':
+        job_id_format = '%J'
+
+    logfile = logfile.format(job_id_format=job_id_format)
+    errfile = errfile.format(job_id_format=job_id_format)
 
     hpc_output_path = prepare_output_location(output_path)
 
@@ -187,7 +204,15 @@ def submit_bash_code(code, output_path, job_name="job", logfile="$PBS_JOBID.outp
     submit_job(hpc_output_path)
 
 
-def submit_python_script(script_file_path, output_path, script_arguments='', job_name="job", logfile="$PBS_JOBID.output", errfile="$PBS_JOBID.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+def submit_python_script(script_file_path, output_path, script_arguments='', job_name="job", logfile="{job_id_format}.output", errfile="{job_id_format}.error", env='base', n_nodes=1, ppn=1, walltime='10:00:00'):
+
+    if HPC_PLATFORM == 'torque':
+        job_id_format = '$PBS_JOBID'
+    elif HPC_PLATFORM == 'lsf':
+        job_id_format = '%J'
+
+    logfile = logfile.format(job_id_format=job_id_format)
+    errfile = errfile.format(job_id_format=job_id_format)
 
     hpc_output_path = prepare_output_location(output_path)
 

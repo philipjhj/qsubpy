@@ -36,5 +36,5 @@ def test_lsf_simple():
     qsub.submit_python_code("import time; print('hi'); time.sleep(10); print('bye')",
                             output_path,
                             job_name='model',
-                            logfile=logpath, errfile=errpath,
+                            #logfile=logpath, errfile=errpath,
                             walltime='02:00')
