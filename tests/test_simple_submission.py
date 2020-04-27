@@ -3,6 +3,8 @@ from pathlib import Path
 
 # TODO: tests should ensure that jobs finish and correct output is generated
 
+qsub.config(hpc_platform='lsf')
+
 
 def test_simple_submission():
     logpath = 'small_test.log'
@@ -11,7 +13,6 @@ def test_simple_submission():
     qsub.submit_python_code("print('hi')",
                             output_path,
                             job_name='model',
-                            logfile=logpath, errfile=errpath,
                             walltime='02:00:00')
 
 
